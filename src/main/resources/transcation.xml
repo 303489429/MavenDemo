@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="gb2312"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+	<bean id="db1Tx"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource">
+            <ref bean="db1" />
+		</property>
+	</bean>
+
+	<bean id="db2Tx"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource">
+			<ref bean="db2" />
+		</property>
+	</bean>
+
+	<bean id="dbcTx"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource">
+		      <ref bean="dbc" />
+		</property>
+	</bean>
+
+	<bean id="routingTransactionManager" class="com.mysoft.manager.impl.RoutingTransactionManager">
+		<property name="targetTransactionManagers">
+			<map value-type="org.springframework.transaction.PlatformTransactionManager">
+				<entry key="db1" value-ref="db1Tx" />
+				<entry key="db2" value-ref="db2Tx" />
+				<entry key="dbc" value-ref="dbcTx" />
+			</map>
+		</property>
+	</bean>
+
+	<!--     配置事务回滚的场景   -->
+	<tx:advice id="txAdvice" transaction-manager="routingTransactionManager">
+		<tx:attributes>
+            		<tx:method name="*" rollback-for="java.lang.Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<!--   指定那些类的哪些方法参与事务   -->
+	<aop:config>
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.mysoft.manager.Manager1.publish(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.mysoft.manager.Manager2.audit(..))"/>
+	</aop:config>
+</beans>

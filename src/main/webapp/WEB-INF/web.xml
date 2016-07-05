@@ -1,0 +1,26 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+<web-app>
+  <display-name>MavenDemo TEST</display-name>
+  <!-- 业务层和持久层的配置文件 -->
+  <context-param>
+      <param-name>logbackConfigLocation</param-name>
+      <param-value>WEB-INF/classes/logback.xml</param-value> 	
+  </context-param>
+ 
+  <listener>
+  	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  
+  <!-- 声明DispatcherServlet -->
+  <servlet>
+  		<servlet-name>myDispatcherServlet</servlet-name>
+  		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  		<load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+  		<servlet-name>myDispatcherServlet</servlet-name>
+  		<url-pattern>*.html</url-pattern>
+  </servlet-mapping>
+</web-app>
